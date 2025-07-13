@@ -1,0 +1,165 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 볼링장
+model BowlingCenter {
+  id               String   @id @default(uuid())
+  name             String   @db.VarChar(100)
+  address          String   @db.VarChar(255)
+  phoneNumber      String?  @map("phone_number") @db.VarChar(20)
+  laneCount        Int      @map("lane_count")
+  parkingAvailable Boolean  @default(false) @map("parking_available")
+  operatingHours   Json?    @map("operating_hours")
+  imageUrl         String?  @map("image_url") @db.VarChar(500)
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  clubs Club[]
+  games Game[]
+
+  @@map("bowling_centers")
+}
+
+// 클럽
+model Club {
+  id              String    @id @default(uuid())
+  name            String    @db.VarChar(100)
+  bowlingCenterId String    @map("bowling_center_id")
+  description     String?   @db.Text
+  establishedDate DateTime? @map("established_date") @db.Date
+  isActive        Boolean   @default(true) @map("is_active")
+  maxMembers      Int       @default(50) @map("max_members")
+  clubFee         Decimal   @default(0) @map("club_fee") @db.Decimal(10, 2)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  bowlingCenter BowlingCenter @relation(fields: [bowlingCenterId], references: [id])
+  members       ClubMember[]
+  games         Game[]
+  clubFees      ClubFee[]
+
+  @@map("clubs")
+}
+
+// 사용자
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique @db.VarChar(255)
+  passwordHash    String   @map("password_hash") @db.VarChar(255)
+  name            String   @db.VarChar(100)
+  phoneNumber     String?  @map("phone_number") @db.VarChar(20)
+  profileImageUrl String?  @map("profile_image_url") @db.VarChar(500)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  clubMemberships ClubMember[]
+  gameScores      GameScore[]
+  feePayments     FeePayment[]
+
+  @@map("users")
+}
+
+// 클럽 회원 (다대다 관계)
+model ClubMember {
+  id           String   @id @default(uuid())
+  clubId       String   @map("club_id")
+  userId       String   @map("user_id")
+  role         Role
+  joinedDate   DateTime @default(now()) @map("joined_date") @db.Date
+  isActive     Boolean  @default(true) @map("is_active")
+  averageScore Int?     @map("average_score")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  club Club @relation(fields: [clubId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([clubId, userId])
+  @@map("club_members")
+}
+
+// 게임
+model Game {
+  id              String   @id @default(uuid())
+  clubId          String   @map("club_id")
+  bowlingCenterId String   @map("bowling_center_id")
+  gameDate        DateTime @map("game_date") @db.Date
+  gameType        String?  @map("game_type") @db.VarChar(50)
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // Relations
+  club          Club          @relation(fields: [clubId], references: [id])
+  bowlingCenter BowlingCenter @relation(fields: [bowlingCenterId], references: [id])
+  scores        GameScore[]
+
+  @@map("games")
+}
+
+// 게임 점수
+model GameScore {
+  id        String   @id @default(uuid())
+  gameId    String   @map("game_id")
+  userId    String   @map("user_id")
+  score     Int
+  gameOrder Int      @map("game_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  game Game @relation(fields: [gameId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("game_scores")
+}
+
+// 클럽 회비
+model ClubFee {
+  id          String   @id @default(uuid())
+  clubId      String   @map("club_id")
+  month       DateTime @db.Date
+  amount      Decimal  @db.Decimal(10, 2)
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  club     Club         @relation(fields: [clubId], references: [id])
+  payments FeePayment[]
+
+  @@unique([clubId, month])
+  @@map("club_fees")
+}
+
+// 회비 납부
+model FeePayment {
+  id            String   @id @default(uuid())
+  clubFeeId     String   @map("club_fee_id")
+  userId        String   @map("user_id")
+  paidAmount    Decimal  @map("paid_amount") @db.Decimal(10, 2)
+  paidDate      DateTime @default(now()) @map("paid_date") @db.Date
+  paymentMethod String?  @map("payment_method") @db.VarChar(50)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // Relations
+  clubFee ClubFee @relation(fields: [clubFeeId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@map("fee_payments")
+}
+
+// Enum for user roles
+enum Role {
+  CLUB_MASTER
+  SUB_MASTER
+  MEMBER
+}

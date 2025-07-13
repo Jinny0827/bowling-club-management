@@ -1,0 +1,56 @@
+# bowling-club-manager/.gitignore
+
+# Environment variables (모든 하위 폴더 적용)
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Dependencies (frontend/backend 모두 적용)
+node_modules/
+*/node_modules/
+
+# Build outputs
+dist/
+build/
+*/dist/
+*/build/
+
+# Backend specific
+backend/prisma/migrations/
+
+# Frontend specific  
+frontend/.next/
+frontend/out/
+
+# Database
+*.db
+*.sqlite
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
