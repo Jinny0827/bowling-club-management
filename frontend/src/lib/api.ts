@@ -1,3 +1,4 @@
+// frontend/src/lib/api.ts
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import { AuthResponse, LoginRequest, RegisterRequest, User, ApiResponse } from './types';
 import Cookies from 'js-cookie';
@@ -35,7 +36,10 @@ class ApiClient {
           if (error.response?.status === 401) {
             // 토큰 만료 또는 인증 실패
             this.logout();
-            window.location.href = '/login';
+            // 클라이언트 사이드에서만 리다이렉트
+            if (typeof window !== 'undefined') {
+              window.location.href = '/login';
+            }
           }
           return Promise.reject(error);
         }
@@ -47,6 +51,16 @@ class ApiClient {
   async register(data: RegisterRequest): Promise<AuthResponse> {
     try {
       const response = await this.client.post<AuthResponse>('/api/auth/register', data);
+
+      // 회원가입 성공 시 토큰 저장
+      if (response.data.data.accessToken) {
+        Cookies.set('accessToken', response.data.data.accessToken, {
+          expires: 7,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict'
+        });
+      }
+
       return response.data;
     } catch (error) {
       throw this.handleError(error);
@@ -76,8 +90,56 @@ class ApiClient {
   // 현재 사용자 정보 조회
   async getCurrentUser(): Promise<User> {
     try {
-      const response = await this.client.get<ApiResponse<User>>('/api/auth/me');
+      console.log('getCurrentUser 호출'); // 디버깅용
+
+      // 먼저 /api/auth/me 시도, 실패하면 /api/auth/profile 시도
+      let response;
+      try {
+        response = await this.client.get<ApiResponse<User>>('/api/auth/me');
+      } catch (error) {
+        console.log('/api/auth/me 실패, /api/auth/profile 시도'); // 디버깅용
+        response = await this.client.get<ApiResponse<User>>('/api/auth/profile');
+      }
+
+      console.log('getCurrentUser 응답:', response.data); // 디버깅용
       return response.data.data!;
+    } catch (error) {
+      console.error('getCurrentUser 에러:', error); // 디버깅용
+      throw this.handleError(error);
+    }
+  }
+
+
+  // 🎯 대시보드 관련 API 메서드들 (새로 추가)
+  // 대시보드 통계 조회
+  async getDashboardStats() {
+    try {
+      const response = await this.client.get('/api/dashboard/stats');
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  // 사용자 클럽 목록 조회
+  async getUserClubs() {
+    try {
+      const response = await this.client.get('/api/dashboard/clubs');
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  // 게임 기록 추가
+  async addGameRecord(gameData: {
+    clubId?: string;
+    score: number;
+    gameType?: string;
+  }) {
+    try {
+      const response = await this.client.post('/api/dashboard/game', gameData);
+      return response.data;
     } catch (error) {
       throw this.handleError(error);
     }
@@ -92,7 +154,6 @@ class ApiClient {
       throw this.handleError(error);
     }
   }
-
 
   // 로그아웃
   logout(): void {

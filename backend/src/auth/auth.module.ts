@@ -1,7 +1,9 @@
+// backend/src/auth/auth.module.ts
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
+import { JwtAuthGuard } from './jwt-auth.guard'; // 🔧 import 추가
 import { UsersModule } from '../user/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
@@ -24,8 +26,15 @@ import { AuthController } from './auth.controller';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    JwtAuthGuard, // 🔧 provider에 추가
+  ],
   controllers: [AuthController],
-  exports: [AuthService], // 다른 모듈에서 사용할 수 있도록 export
+  exports: [
+    AuthService,
+    JwtAuthGuard, // 🔧 export에 추가 - 핵심!
+  ],
 })
 export class AuthModule {}

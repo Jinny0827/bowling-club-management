@@ -32,6 +32,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-call': 'off', // 추가
       '@typescript-eslint/no-unsafe-member-access': 'off', // 추가 (예방차원)
+      '@typescript-eslint/no-unsafe-return': 'off',
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
     },
   },

@@ -1,6 +1,8 @@
+// frontend/src/app/layout.tsx
 import type { Metadata } from "next";
 import './globals.css';
 import Navbar from '@/components/Navbar';
+import ClientLayout from '@/components/ClientLayout';
 
 export const metadata: Metadata = {
   title: '볼링 클럽 관리 시스템',
@@ -8,13 +10,18 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-    children,}: {   children: React.ReactNode; }) {
+                                     children,
+                                   }: {
+  children: React.ReactNode;
+}) {
   return (
       <html lang="ko">
-        <body className="bg-gray-50 min-h-screen">
-          <Navbar />
-          <main>{children}</main>
-        </body>
+      <body className="bg-gray-50 min-h-screen">
+      <ClientLayout>
+        <Navbar />
+        <main>{children}</main>
+      </ClientLayout>
+      </body>
       </html>
   );
 }

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import Cookies from 'js-cookie';
 import { User, LoginRequest, RegisterRequest } from '@/lib/types';
 import { apiClient } from '@/lib/api';
 
@@ -16,34 +17,34 @@ interface AuthActions {
   fetchUser: () => Promise<void>;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
-  checkAuth: () => Promise<void>;
+  checkAuth: () => void;
 }
 
 export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
   // 상태
   user: null,
-  isLoading: false,
+  isLoading: true, // 초기에는 로딩 상태로 시작
   isAuthenticated: false,
   error: null,
 
   // 액션들
-  login: async (data:LoginRequest) => {
+  login: async (data: LoginRequest) => {
     try {
-      set({isLoading: true, error: null});
+      set({ isLoading: true, error: null });
 
       const response = await apiClient.login(data);
 
       set({
         user: response.data.user,
         isAuthenticated: true,
-        isLoading: true,
+        isLoading: false,
       });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : '로그인에 실패했습니다.',
         isLoading: false,
         isAuthenticated: false,
-      })
+      });
       throw error;
     }
   },
@@ -80,6 +81,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
 
   fetchUser: async () => {
     try {
+
       if (!apiClient.isAuthenticated()) {
         set({ isAuthenticated: false, user: null });
         return;
@@ -93,7 +95,10 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
         isAuthenticated: true,
         isLoading: false
       });
+
     } catch (error) {
+      // 토큰이 만료되었거나 유효하지 않은 경우
+      Cookies.remove('accessToken');
       set({
         user: null,
         isAuthenticated: false,
@@ -103,9 +108,21 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
     }
   },
 
-  checkAuth: async () => {
+  checkAuth: () => {
+
+    // 앱 시작 시 토큰이 있으면 사용자 정보 복원 (비동기로 백그라운드에서 실행)
     if (apiClient.isAuthenticated()) {
-      await get().fetchUser();
+      get().fetchUser().catch((error) => {
+        console.error('사용자 정보 복원 실패:', error);
+      });
+    } else {
+      console.log('토큰 없음, 로그아웃 상태로 설정'); // 디버깅용
+      // 토큰이 없으면 로그아웃 상태로 설정
+      set({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false
+      });
     }
   },
 

@@ -6,7 +6,7 @@ import { LogOut, User, Settings, Trophy } from 'lucide-react';
 import {useRouter} from "next/navigation";
 
 export default function Navbar() {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, isLoading, logout } = useAuthStore();
   const router = useRouter();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -18,7 +18,6 @@ export default function Navbar() {
   const handleLogin = () => {
     router.push('/login');
   }
-
 
   return (
       <nav className="bg-white shadow-md border-b border-gray-200">
@@ -69,7 +68,13 @@ export default function Navbar() {
 
             {/* 사용자 메뉴 */}
             <div className="flex items-center space-x-4">
-              {isAuthenticated ? (
+              {isLoading ? (
+                  // 로딩 중일 때는 스피너 표시
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                    <span className="text-gray-500 text-sm">로딩 중...</span>
+                  </div>
+              ) : isAuthenticated ? (
                   <div className="relative">
                     <button
                         onClick={() => setShowUserMenu(!showUserMenu)}
@@ -114,12 +119,14 @@ export default function Navbar() {
                     )}
                   </div>
               ) : (
-                  <button
-                      onClick={handleLogin}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
-                  >
-                    로그인
-                  </button>
+                  <div>
+                    <button
+                        onClick={handleLogin}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      로그인
+                    </button>
+                  </div>
               )}
             </div>
           </div>
