@@ -48,6 +48,42 @@ a {
   text-decoration: none;
 }
 
+/* ===== macOS Chrome 자동완성 문제 해결 (추가!) ===== */
+input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"] {
+  background-color: white !important;
+  color: #1f2937 !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Chrome 자동완성 스타일 덮어쓰기 */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  -webkit-text-fill-color: #1f2937 !important;
+  background-color: white !important;
+  color: #1f2937 !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* Firefox 자동완성 스타일 */
+input:-moz-autofill {
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
+/* 폼 필드 기본 스타일 강화 */
+input:focus {
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
 /* 글래스모피즘 효과 */
 .glass {
   backdrop-filter: blur(16px);

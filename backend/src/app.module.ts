@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './user/users.module';
 import { AuthModule } from './auth/auth.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { GamesModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     UsersModule,
     DashboardModule,
     // ClubsModule,
-    // GamesModule,
+    GamesModule,
     // FeesModule,
   ],
   controllers: [AppController],
