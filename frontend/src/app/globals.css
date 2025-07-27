@@ -48,6 +48,36 @@ a {
   text-decoration: none;
 }
 
+/* ===== Input 자동완성 문제 해결 ===== */
+input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"] {
+  background-color: white !important;
+  color: #1f2937 !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Chrome/Safari 자동완성 스타일 덮어쓰기 */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  -webkit-text-fill-color: #1f2937 !important;
+  background-color: white !important;
+  color: #1f2937 !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* 폼 필드 기본 스타일 강화 */
+input:focus {
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
 /* 글래스모피즘 효과 */
 .glass {
   backdrop-filter: blur(16px);
@@ -111,7 +141,7 @@ a {
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
-/* 로딩 스피너 (글래스모피즘) */
+/* 로딩 스피너 */
 @keyframes spin {
   to {
     transform: rotate(360deg);

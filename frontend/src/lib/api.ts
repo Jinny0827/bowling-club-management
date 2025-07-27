@@ -33,10 +33,12 @@ class ApiClient {
     this.client.interceptors.response.use(
         (response) => response,
         (error: AxiosError) => {
-          if (error.response?.status === 401) {
-            // 토큰 만료 또는 인증 실패
+          const isLoginRequest = error.config?.url?.includes('/auth/login');
+          const isRegisterRequest = error.config?.url?.includes('/auth/register');
+
+          if (error.response?.status === 401 && !isLoginRequest && !isRegisterRequest) {
+            // 로그인/회원가입 요청이 아닌 경우에만 자동 로그아웃 및 리다이렉트
             this.logout();
-            // 클라이언트 사이드에서만 리다이렉트
             if (typeof window !== 'undefined') {
               window.location.href = '/login';
             }
@@ -97,7 +99,7 @@ class ApiClient {
       try {
         response = await this.client.get<ApiResponse<User>>('/api/auth/me');
       } catch (error) {
-        console.log('/api/auth/me 실패, /api/auth/profile 시도'); // 디버깅용
+        console.log(error, '/api/auth/me 실패, /api/auth/profile 시도'); // 디버깅용
         response = await this.client.get<ApiResponse<User>>('/api/auth/profile');
       }
 

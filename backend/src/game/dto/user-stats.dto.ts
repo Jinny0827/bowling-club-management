@@ -9,7 +9,7 @@ export class UserStatsDto {
     score: number;
     gameOrder: number;
     gameDate: string;
-    gameType?: string;
+    gameType?: string | null;
     club: {
       name: string;
     };
