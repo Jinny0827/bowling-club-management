@@ -99,7 +99,7 @@ class ApiClient {
       try {
         response = await this.client.get<ApiResponse<User>>('/api/auth/me');
       } catch (error) {
-        console.log('/api/auth/me 실패, /api/auth/profile 시도'); // 디버깅용
+        console.log(error, '/api/auth/me 실패, /api/auth/profile 시도'); // 디버깅용
         response = await this.client.get<ApiResponse<User>>('/api/auth/profile');
       }
 

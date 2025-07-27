@@ -48,7 +48,7 @@ a {
   text-decoration: none;
 }
 
-/* ===== macOS Chrome 자동완성 문제 해결 (추가!) ===== */
+/* ===== Input 자동완성 문제 해결 ===== */
 input,
 input[type="text"],
 input[type="email"],
@@ -60,7 +60,7 @@ input[type="tel"] {
   appearance: none !important;
 }
 
-/* Chrome 자동완성 스타일 덮어쓰기 */
+/* Chrome/Safari 자동완성 스타일 덮어쓰기 */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -70,12 +70,6 @@ input:-webkit-autofill:active {
   background-color: white !important;
   color: #1f2937 !important;
   transition: background-color 5000s ease-in-out 0s !important;
-}
-
-/* Firefox 자동완성 스타일 */
-input:-moz-autofill {
-  background-color: white !important;
-  color: #1f2937 !important;
 }
 
 /* 폼 필드 기본 스타일 강화 */
@@ -147,7 +141,7 @@ input:focus {
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
-/* 로딩 스피너 (글래스모피즘) */
+/* 로딩 스피너 */
 @keyframes spin {
   to {
     transform: rotate(360deg);
