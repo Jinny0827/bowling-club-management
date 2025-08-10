@@ -12,7 +12,11 @@ async function bootstrap() {
 
   // CORS 설정(프론트 엔드)
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'], // 프론트엔드 URL
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://172.30.1.9:3001',
+    ], // 프론트엔드 URL
     credentials: true,
   });
 
