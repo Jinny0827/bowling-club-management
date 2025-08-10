@@ -48,14 +48,16 @@ export class AuthController {
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     try {
+      console.log('🔍 로그인 요청 받음:', loginDto); // 추가
       const result = await this.authService.login(loginDto);
+      console.log('✅ 로그인 성공:', result.user.email); // 추가
       return {
         statusCode: HttpStatus.OK,
         message: '로그인이 완료되었습니다.',
         data: result,
       };
     } catch (error: any) {
-      // 💡 타입 명시
+      console.error('❌ 로그인 실패:', error.message); // 추가
       throw new HttpException(
         '이메일 또는 비밀번호가 올바르지 않습니다.',
         HttpStatus.UNAUTHORIZED,
