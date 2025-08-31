@@ -64,7 +64,8 @@ export default function GamesHistoryPage() {
             const response = await apiClient.getMyGameScores(params);
 
             // 백엔드 응답 구조에 맞춰 데이터 추출
-            const gameScores = response.gameScores || response.data;
+            // const gameScores = response.gameScores || response.data;
+            const gameScores = response.gameScores;
             const paginationData = response.pagination || {
                 page: page,
                 limit: 20,

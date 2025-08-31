@@ -154,12 +154,27 @@ export interface PaginationResponse<T> {
 }
 
 // 게임 점수 목록 조회 응답
-export type GameScoreListResponse = PaginationResponse<GameScore & {
-  game: Game & {
-    club: { name: string };
-    bowlingCenter: { name: string };
+// export type GameScoreListResponse = PaginationResponse<GameScore & {
+//   game: Game & {
+//     club: { name: string };
+//     bowlingCenter: { name: string };
+//   };
+// }>;
+
+export interface GameScoreListResponse {
+  gameScores: (GameScore & {
+    game: Game & {
+      club: { name: string };
+      bowlingCenter: { name: string };
+    };
+  })[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
   };
-}>;
+}
 
 // 클럽 목록 조회 응답
 export type ClubListResponse = PaginationResponse<Club & {
