@@ -67,6 +67,7 @@ model User {
   clubMemberships ClubMember[]
   gameScores      GameScore[]
   feePayments     FeePayment[]
+  FrameRecord     FrameRecord[]
 
   @@map("users")
 }
@@ -103,6 +104,7 @@ model Game {
   club          Club          @relation(fields: [clubId], references: [id])
   bowlingCenter BowlingCenter @relation(fields: [bowlingCenterId], references: [id])
   scores        GameScore[]
+  FrameRecord   FrameRecord[]
 
   @@map("games")
 }
@@ -117,8 +119,9 @@ model GameScore {
   createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  game Game @relation(fields: [gameId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  game        Game          @relation(fields: [gameId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+  FrameRecord FrameRecord[]
 
   @@map("game_scores")
 }
@@ -138,6 +141,30 @@ model ClubFee {
 
   @@unique([clubId, month])
   @@map("club_fees")
+}
+
+// 🎳 새로운 테이블: 프레임별 상세 기록
+model FrameRecord {
+  id           String    @id @default(uuid())
+  gameScoreId  String    @map("game_score_id")
+  gameId       String    @map("game_id")
+  userId       String    @map("user_id")
+  frameNumber  Int       @map("frame_number") // 1-10
+  firstRoll    String?   @map("first_roll") @db.VarChar(3) // "X", "7", "-", etc.
+  secondRoll   String?   @map("second_roll") @db.VarChar(3) // "/", "3", null, etc.
+  thirdRoll    String?   @map("third_roll") @db.VarChar(3) // 10프레임만 (스트라이크/스페어 시)
+  frameScore   Int?      @map("frame_score") // 해당 프레임 점수
+  runningTotal Int?      @map("running_total") // 누적 점수
+  frameType    FrameType @default(NORMAL) @map("frame_type") // 스트라이크/스페어/일반
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  gameScore GameScore @relation(fields: [gameScoreId], references: [id], onDelete: Cascade)
+  game      Game      @relation(fields: [gameId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([gameScoreId, frameNumber])
+  @@map("frame_records")
 }
 
 // 회비 납부
@@ -162,4 +189,11 @@ enum Role {
   CLUB_MASTER
   SUB_MASTER
   MEMBER
+}
+
+// 프레임 기록용 상수 추가
+enum FrameType {
+  NORMAL // 일반 프레임
+  SPARE // 스페어 (/)
+  STRIKE // 스트라이크 (X)
 }
