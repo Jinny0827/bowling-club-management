@@ -1,27 +1,21 @@
 # 볼링 클럽 관리 시스템
 
-볼링 클럽의 회원, 게임 기록, 회비를 관리하는 웹 애플리케이션입니다.
-
-## 🏗️ 프로젝트 구조
+## 프로젝트 구조
 ```
-bowling-club-manager/
+bowling-club-management/
 ├── frontend/                 # Next.js 앱
-├── backend/                 # Nest.js API 서버  
+├── backend/                 # Nest.js API 서버
+├── docker-compose.yml       # Docker Compose 설정
+├── nginx.conf               # Nginx 리버스 프록시 설정
 └── database/               # DB 스키마/시드 데이터
 ```
 
-## 🛠️ 기술 스택
-- **백엔드**: NestJS + Prisma + PostgreSQL
-- **프론트엔드**: Next.js + TypeScript (예정)
-- **인증**: JWT
-- **데이터베이스**: PostgreSQL
-
-## 🚀 프로젝트 설치 및 실행
+## 🚀 로컬 개발 환경 설정
 
 ### 1. 저장소 클론
 ```bash
-git clone https://github.com/username/bowling-club-manager.git
-cd bowling-club-manager
+git clone https://github.com/Jinny0827/bowling-club-management.git
+cd bowling-club-management
 ```
 
 ### 2. 환경 변수 설정
@@ -64,7 +58,7 @@ CREATE DATABASE bowling_club_db;
 ```bash
 cd backend
 
-# 패키지 설치 (PowerShell 권장)
+# 패키지 설치
 npm install
 
 # Prisma Client 생성
@@ -87,138 +81,167 @@ npm install
 npm run dev
 ```
 
-## 📝 개발 환경 요구사항
+---
 
-- **Node.js**: 18.18 이상 (Prisma 호환성)
-- **PostgreSQL**: 13.x 이상
-- **npm**: 8.x 이상
-- **Git**: 2.x 이상
+## 🐳 Docker 배포 (AWS EC2)
 
-## 🔧 개발 도구 설정
+### 사전 준비
+- AWS 계정
+- SSH 키페어
+- EC2 인스턴스 (Ubuntu 24.04)
+- Docker 및 Docker Compose 설치
 
-### WebStorm / IntelliJ 설정
+### 1. 환경 변수 설정
 
-#### 1. 터미널 설정
-- **File** → **Settings** → **Tools** → **Terminal**
-- **Shell path**: `powershell.exe` (npm 작업용)
-- Git 작업은 별도 Git Bash 사용 권장
-
-#### 2. ESLint 설정
-- **File** → **Settings** → **Languages & Frameworks** → **JavaScript** → **Code Quality Tools** → **ESLint**
-- ✅ **Automatic ESLint configuration** 체크
-- ✅ **Run eslint --fix on save** 체크
-
-#### 3. Prettier 설정
-- **Languages & Frameworks** → **JavaScript** → **Prettier**
-- ✅ **Automatic Prettier configuration** 선택
-- ✅ **Run on save** 체크
-- ✅ **Run on 'Reformat Code' action** 체크
-
-#### 4. 코드 스타일 통일
-- **Editor** → **Code Style** → **TypeScript**
-- **Tab size**: `2`
-- **Indent**: `2`
-- **Use tab character**: 체크 해제 (스페이스 사용)
-
-### VS Code 설정 (선택사항)
-
-`.vscode/settings.json` 파일 생성:
-```json
-{
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  }
-}
+```bash
+# 프로젝트 루트에서
+cp .env.example .env
+nano .env
 ```
 
-## 🛠️ 기술 스택 상세
+`.env` 파일 수정:
+```bash
+DB_NAME=bowling_club_db
+DB_USER=postgres
+DB_PASSWORD=강력한_비밀번호_입력  # 반드시 변경!
+JWT_SECRET=랜덤_32자_이상_문자열  # 반드시 변경!
+NODE_ENV=production
+```
+
+### 2. Docker 빌드 및 실행
+
+```bash
+# 빌드 및 실행
+docker-compose up -d --build
+
+# 로그 확인
+docker-compose logs -f
+
+# 서비스 상태 확인
+docker-compose ps
+```
+
+### 3. 데이터베이스 초기화
+
+```bash
+# Backend 컨테이너 접속
+docker exec -it bowling_backend sh
+
+# Prisma 마이그레이션
+npx prisma db push
+
+# 컨테이너 나가기
+exit
+```
+
+### 4. 서비스 확인
+
+```bash
+# 헬스체크
+curl http://localhost/health
+
+# API 확인
+curl http://localhost/api
+
+# 프론트엔드 확인
+curl http://localhost
+```
+
+### 5. 중지 및 재시작
+
+```bash
+# 중지
+docker-compose down
+
+# 재시작
+docker-compose up -d
+
+# 전체 재빌드
+docker-compose down
+docker-compose up -d --build
+```
+
+### Docker 명령어 참고
+
+```bash
+# 로그 확인
+docker-compose logs backend
+docker-compose logs frontend
+docker-compose logs postgres
+
+# 컨테이너 재시작
+docker-compose restart backend
+
+# 볼륨 포함 완전 삭제 (데이터 초기화)
+docker-compose down -v
+```
+
+---
+
+## 📝 개발 환경 요구사항
+
+- **Node.js**: 18.x 이상
+- **PostgreSQL**: 13.x 이상 (로컬 개발 시)
+- **npm**: 8.x 이상
+- **Docker**: 20.x 이상 (배포 시)
+- **Docker Compose**: 2.x 이상 (배포 시)
+
+## 🔧 기술 스택
 
 - **백엔드**: NestJS + Prisma + PostgreSQL
-- **프론트엔드**: Next.js + TypeScript (예정)
+- **프론트엔드**: Next.js + TypeScript
 - **인증**: JWT
 - **데이터베이스**: PostgreSQL
-- **코드 품질**: ESLint + Prettier
-- **API 문서**: Swagger (향후 추가)
+- **컨테이너**: Docker + Docker Compose
+- **프록시**: Nginx
 
 ## 📂 중요한 파일들
 
-- `.env`: 환경 변수 (Git에서 제외됨)
-- `.env.example`: 환경 변수 템플릿
+### 개발 환경
+- `backend/.env`: 백엔드 환경 변수 (Git에서 제외됨)
+- `backend/.env.example`: 백엔드 환경 변수 템플릿
 - `backend/prisma/schema.prisma`: 데이터베이스 스키마
 - `DATABASE_SPEC.md`: 데이터베이스 명세서
-- `eslint.config.mjs`: ESLint 설정
-- `.prettierrc`: Prettier 설정
 
-## 🚨 개발 시 주의사항
+### 배포 환경
+- `.env`: Docker Compose 환경 변수 (Git에서 제외됨)
+- `.env.example`: Docker Compose 환경 변수 템플릿
+- `docker-compose.yml`: Docker 서비스 정의
+- `nginx.conf`: Nginx 설정
+- `backend/Dockerfile`: 백엔드 컨테이너 이미지
+- `frontend/Dockerfile`: 프론트엔드 컨테이너 이미지
 
-### 보안
+## 🚨 보안 주의사항
+
 1. **절대 .env 파일을 Git에 커밋하지 마세요**
 2. **JWT_SECRET은 프로덕션에서 강력한 키로 변경하세요**
+   ```bash
+   # 강력한 랜덤 키 생성
+   openssl rand -base64 32
+   ```
 3. **데이터베이스 비밀번호는 강력하게 설정하세요**
-
-### 코드 품질
-1. **커밋 전 ESLint 에러 확인**: `npm run lint`
-2. **Prettier 포맷팅 적용**: `npm run format`
-3. **타입 에러 확인**: `npm run build`
-
-### 터미널 사용
-- **npm 작업**: PowerShell 사용 권장
-- **Git 작업**: Git Bash 사용 가능
-- **Node.js 관련 에러 시**: 관리자 권한 PowerShell 사용
+4. **프로덕션 환경에서는 HTTPS 설정 필수**
 
 ## 🤝 기여 가이드
 
 1. 이슈 생성
 2. 브랜치 생성 (`git checkout -b feature/new-feature`)
-3. 코드 작성 (ESLint 규칙 준수)
-4. 커밋 (`git commit -am 'Add some feature'`)
-5. 푸시 (`git push origin feature/new-feature`)
-6. Pull Request 생성
+3. 커밋 (`git commit -am 'Add some feature'`)
+4. 푸시 (`git push origin feature/new-feature`)
+5. Pull Request 생성
 
 ## 📋 할 일 목록
 
 - [x] 데이터베이스 스키마 설계
 - [x] Prisma 설정
-- [x] 개발 환경 설정 (ESLint, Prettier)
-- [ ] JWT 인증 시스템 (진행 중)
+- [x] Docker 환경 구성
+- [ ] JWT 인증 시스템
 - [ ] 클럽 관리 기능
 - [ ] 게임 기록 기능
 - [ ] 회비 관리 기능
-- [ ] API 문서화 (Swagger)
 - [ ] 프론트엔드 구현
-
-## 🐛 문제 해결
-
-### 자주 발생하는 문제들
-
-#### npm install 실패
-```bash
-# 해결 방법
-npm cache clean --force
-rm -rf node_modules package-lock.json
-npm install
-```
-
-#### Prisma 에러
-```bash
-# Prisma Client 재생성
-npx prisma generate
-npx prisma db push
-```
-
-#### ESLint/Prettier 충돌
-```bash
-# 포맷팅 적용
-npm run format
-npm run lint --fix
-```
-
-## 📄 라이선스
-
-MIT License
+- [ ] HTTPS 설정 (Let's Encrypt)
 
 ## 📞 문의
 
-프로젝트에 대한 문의사항이 있으시면 Issues를 통해 연락해주세요.
+- GitHub Issues: https://github.com/Jinny0827/bowling-club-management/issues

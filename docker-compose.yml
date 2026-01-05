@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 데이터베이스
+  postgres:
+    image: postgres:15-alpine
+    container_name: bowling_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bowling_network
+
+  # NestJS 백엔드
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bowling_backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    networks:
+      - bowling_network
+
+  # Next.js 프론트엔드
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bowling_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:3000
+    ports:
+      - "3001:3001"
+    networks:
+      - bowling_network
+
+  # Nginx 리버스 프록시
+  nginx:
+    image: nginx:alpine
+    container_name: bowling_nginx
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - bowling_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  bowling_network:
+    driver: bridge
