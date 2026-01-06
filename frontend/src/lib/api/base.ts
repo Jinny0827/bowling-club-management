@@ -7,7 +7,7 @@ export class BaseApiClient {
     // todo 임시 주소 (로컬/개발/운영 분기 예정)
     // protected baseURL = 'http://localhost:3000';
     // protected baseURL = process.env.NEXT_PUBLIC_API_URL  || '/api';
-    protected baseURL: '';
+    protected baseURL = '';
 
     constructor() {
         this.client = axios.create({
