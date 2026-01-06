@@ -23,7 +23,9 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000',
       'http://localhost:3001',
-      'http://172.30.1.9:3001', // 개발 환경 IP
+      'http://172.30.1.9:3001',
+      'http://bowling-manager.com',
+      'https://bowling-manager.com',
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
