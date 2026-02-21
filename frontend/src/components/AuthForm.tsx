@@ -58,7 +58,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
       clearError();
       await login(data);
       router.push('/dashboard');
-    } catch (error) {
+    } catch {
       // 에러는 store에서 처리됨
     }
   };
@@ -68,12 +68,10 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
       clearError();
       await registerUser(data);
       router.push('/dashboard');
-    } catch (error) {
+    } catch {
       // 에러는 store에서 처리됨
     }
   };
-
-  const currentForm = mode === 'login' ? loginForm : registerForm;
 
   return (
       <div className="w-full max-w-md mx-auto">

@@ -189,6 +189,15 @@ export class DashboardService {
       score: number;
       gameType?: string;
       bowlingCenterId?: string;
+      frameRecords?: Array<{
+        frameNumber: number;
+        firstRoll: string | null;
+        secondRoll: string | null;
+        thirdRoll: string | null;
+        frameScore: number | null;
+        runningTotal: number | null;
+        frameType: 'NORMAL' | 'SPARE' | 'STRIKE';
+      }>;
     },
   ) {
     try {
@@ -255,6 +264,24 @@ export class DashboardService {
             },
           },
         });
+
+        // 3. 프레임별 기록 저장 (있는 경우)
+        if (gameData.frameRecords && gameData.frameRecords.length > 0) {
+          await prisma.frameRecord.createMany({
+            data: gameData.frameRecords.map((frame) => ({
+              gameScoreId: gameScore.id,
+              gameId: game.id,
+              userId,
+              frameNumber: frame.frameNumber,
+              firstRoll: frame.firstRoll,
+              secondRoll: frame.secondRoll,
+              thirdRoll: frame.thirdRoll,
+              frameScore: frame.frameScore,
+              runningTotal: frame.runningTotal,
+              frameType: frame.frameType,
+            })),
+          });
+        }
 
         return gameScore;
       });

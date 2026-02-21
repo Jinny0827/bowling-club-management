@@ -27,6 +27,15 @@ export class DashboardApi extends BaseApiClient {
         clubId?: string;
         score: number;
         gameType?: string;
+        frameRecords?: Array<{
+            frameNumber: number;
+            firstRoll: string | null;
+            secondRoll: string | null;
+            thirdRoll: string | null;
+            frameScore: number | null;
+            runningTotal: number | null;
+            frameType: 'NORMAL' | 'SPARE' | 'STRIKE';
+        }>;
     }) {
         try {
             const response = await this.client.post('/api/dashboard/game', gameData);

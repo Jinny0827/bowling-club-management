@@ -112,6 +112,17 @@ export interface ClubMember {
   user?: User;
 }
 
+// 프레임 기록 타입 (데이터베이스와 동기화됨)
+export interface FrameRecord {
+  frameNumber: number;          // 1-10
+  firstRoll: string | null;     // "X", "7", "-", etc.
+  secondRoll: string | null;    // "/", "3", null, etc.
+  thirdRoll: string | null;     // 10프레임만
+  frameScore: number | null;
+  runningTotal: number | null;
+  frameType: 'NORMAL' | 'SPARE' | 'STRIKE';
+}
+
 // ===== API 요청/응답 타입들 =====
 
 // 사용자 통계 타입 (백엔드 DTO와 동기화됨)

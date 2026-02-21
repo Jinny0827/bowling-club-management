@@ -89,6 +89,15 @@ export class DashboardController {
       clubId?: string;
       score: number;
       gameType?: string;
+      frameRecords?: Array<{
+        frameNumber: number;
+        firstRoll: string | null;
+        secondRoll: string | null;
+        thirdRoll: string | null;
+        frameScore: number | null;
+        runningTotal: number | null;
+        frameType: 'NORMAL' | 'SPARE' | 'STRIKE';
+      }>;
     },
   ) {
     if (!req.user?.id) {

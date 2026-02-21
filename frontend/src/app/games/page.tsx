@@ -89,6 +89,7 @@ export default function GamesHistoryPage() {
 
     useEffect(() => {
         loadGames();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortOption]);
 
     // 페이지 변경

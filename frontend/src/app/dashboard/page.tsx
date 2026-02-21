@@ -8,7 +8,6 @@ import GameRecordModal from '@/components/GameRecordModal';
 import {
   Trophy,
   Users,
-  TrendingUp,
   Target,
   Plus,
   Clock,
@@ -19,7 +18,8 @@ import {
   BarChart3,
   Star,
   Zap,
-  RefreshCw
+  RefreshCw,
+  X
 } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 
@@ -92,6 +92,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [isGameModalOpen, setIsGameModalOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedGame, setSelectedGame] = useState<RecentGame | null>(null);
 
   const fetchDashboardData = async (): Promise<void> => {
     try {
@@ -247,7 +248,7 @@ export default function Dashboard() {
                   {stats?.recentGames && stats.recentGames.length > 0 ? (
                       <div className="space-y-4">
                         {stats.recentGames.map((game, index) => (
-                            <div key={index} className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 p-4 hover:bg-white/10 transition-all duration-300 group">
+                            <div key={index} onClick={() => setSelectedGame(game)} className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 p-4 hover:bg-white/10 transition-all duration-300 group cursor-pointer">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-4">
                                   <div className="p-2 bg-blue-500/20 backdrop-blur-xl rounded-xl border border-blue-300/30 group-hover:scale-110 transition-transform duration-300">
